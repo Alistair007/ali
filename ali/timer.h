@@ -8,6 +8,10 @@
 
 namespace ali {
 	using namespace std::chrono;
+	using milliseconds = milliseconds;
+	using seconds = seconds;
+	using minutes = minutes;
+	using hours = hours;
 	class Timer
 	{
 	public:
@@ -20,7 +24,7 @@ namespace ali {
 		template<typename T>
 		auto time_passed()
 		{
-			return duration_cast<T>(end - high_resolution_clock::now());
+			return duration_cast<T>(high_resolution_clock::now() - begin);
 		}
 
 		template<typename T>

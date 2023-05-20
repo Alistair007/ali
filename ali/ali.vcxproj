@@ -129,6 +129,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="console.h" />
+    <ClInclude Include="convert.h" />
+    <ClInclude Include="saved.h" />
     <ClInclude Include="smart_queue.h" />
     <ClInclude Include="timer.h" />
   </ItemGroup>

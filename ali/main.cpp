@@ -1,17 +1,32 @@
-#include "console.h"
 #include "timer.h"
+#include "console.h"
+#include <iostream>
 
+#include <windows.h>
 int main()
 {
-	ali::Timer timer;
-	const int times = 1000000000;
-	
+	const size_t times = 10000;
+	ali::Timer x;
+	for (size_t i = 0; i < times; i++)
+	{
+		std::cout << i;
+	}
+	auto cout = x.time_passed<ali::milliseconds>().count();
+	for (size_t i = 0; i < times; i++)
+	{
+		printf("%ld", i);
+	}
+	auto ptf = x.time_passed<ali::milliseconds>().count() - cout;
+	for (size_t i = 0; i < times; i++)
+	{
+		ali::console.log(i);
+	}
+	auto consolelog = x.time_passed<ali::milliseconds>().count() - cout - ptf;
 	for (size_t i = 0; i < times; i++)
 	{
 		ali::console.enqueue(i);
 	}
-
-	timer.stop();
-	auto x = timer.get_time<std::chrono::milliseconds>().count();
-	std::cout << '\n' << x << "ms. " << (float)x / times << " milliseconds/log.";
+	ali::console.dequeue();
+	auto queue = x.time_passed<ali::milliseconds>().count() - cout - ptf - consolelog;
+	std::cout << "\nstd::cout: " << cout << "\nprintf(): " << ptf << "\nconsole.log(): " << consolelog << "\nqueue: " << queue;
 }
