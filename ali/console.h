@@ -56,19 +56,17 @@ namespace ali{
 				type = "%i";
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value)
 				type = "%ld";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, float>::value) {
+			else if constexpr (std::is_same<std::remove_all_extents_t<T>, float>::value || std::is_same<std::remove_all_extents_t<T>, double>::value) {
 				string y = "%.";
 				y += to_string(precision);
 				y += "f";
 				type = y.c_str();
-				printf(type, x);
-				return;
-			}
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, double>::value) {
-				string y = "%.";
-				y += to_string(precision);
-				y += "f";
-				type = y.c_str();
+				if constexpr (std::is_array<T>::value)
+				{
+					for (const auto& a : x)
+						printf(type, a);
+				} else
+					printf(type, x);
 				return;
 			}
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, std::string>::value) {
@@ -137,7 +135,7 @@ namespace ali{
 		}
 		Console() { };
 		~Console() { };
-		size_t precision = 4;
+		size_t precision = 6;
 	private:
 		std::string queue;
 		const HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
