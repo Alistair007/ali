@@ -5,7 +5,15 @@
 #include <windows.h>
 int main()
 {
+	float x = 1.2123f;
+	printf("%.0f", x);
+	try {
+		console.log(x);
+	}
+	catch (...)
+	{
 
+	}
 }
 
 //void printShowcase()

@@ -30,6 +30,19 @@ namespace ali{
 			yellow = 14,
 			white = 15,
 		};
+
+
+		template <class ... Ts>
+		void logf(Ts && ... inputs)
+		{
+			int i = 0;
+			([&]
+				{
+					++i; // i is the current place
+					log(inputs);
+				} (), ...);
+		}
+
 		template<typename T>
 		void log(const T& x) {
 			const char* type = "%s";
@@ -43,59 +56,40 @@ namespace ali{
 				type = "%i";
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value)
 				type = "%ld";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value)
-				type = "%f";
+			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value) {
+				string y = "%.";
+				y += to_string(precision);
+				y += "f";
+				type = y.c_str();
+			}
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, std::string>::value) {
-				printf(x.c_str());
+				if constexpr (std::is_array<T>::value) {
+					for (const auto& a : x)
+					{
+						printf(a.c_str());
+					}
+				}
+				else 
+					printf(x.c_str());
 				return;
 			}
-			if constexpr (!std::is_array<T>::value) {
-				printf(type, x);
-			}
-			else {
+			if constexpr (std::is_array<T>::value) {
 				for (const auto& a : x)
 				{
 					printf(type, a);
 				}
+			}
+			else if constexpr (std::is_pointer<T>::value) {
+				printf("%p", x);
+			}
+			else {
+				printf(type, x);
 			}
 		}
 		template<typename T>
 		void log(const T& x, size_t font, size_t background = colors::black) {
-			const char* type = "%s";
 			SetConsoleTextAttribute(hConsole, background * 16 + font);
-			if constexpr (std::is_same<std::remove_all_extents_t<T>, char*>::value || std::is_same<std::remove_all_extents_t<T>, const char*>::value)
-				type = "%s";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, char>::value)
-				type = "%c";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, int>::value)
-				type = "%i";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value)
-				type = "%ld";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, std::string>::value) {
-				printf(x.c_str());
-				return;
-			}
-			if constexpr (!std::is_array<T>::value) {
-				printf(type, x);
-			}
-			else {
-				if constexpr (std::is_same<std::remove_all_extents_t<T>, char*>::value || std::is_same<std::remove_all_extents_t<T>, const char*>::value)
-					type = "%s";
-				else if constexpr (std::is_same<std::remove_all_extents_t<T>, char>::value)
-					type = "%c";
-				else if constexpr (std::is_same<std::remove_all_extents_t<T>, int>::value)
-					type = "%i";
-				else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value)
-					type = "%ld";
-				else if constexpr (std::is_same<std::remove_all_extents_t<T>, std::string>::value) {
-					printf(x.c_str());
-					return;
-				}
-				for (const auto& a : x)
-				{
-					printf(type, a);
-				}
-			}
+			log(x);
 			SetConsoleTextAttribute(hConsole, 7);
 		}
 
@@ -134,14 +128,14 @@ namespace ali{
 		}
 		Console() { };
 		~Console() { };
+		size_t precision = 4;
 	private:
 		std::string queue;
 		const HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	};
 
-	Console console;
-
 	#define Colors Console::colors
 	#define COLOR_ERROR console::colors::black,console::colors::red
 	#define COLOR_SUCCESS console::colors::green,console::colors::black
 }
+ali::Console console;
