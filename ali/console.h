@@ -56,11 +56,20 @@ namespace ali{
 				type = "%i";
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value)
 				type = "%ld";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value) {
+			else if constexpr (std::is_same<std::remove_all_extents_t<T>, float>::value) {
 				string y = "%.";
 				y += to_string(precision);
 				y += "f";
 				type = y.c_str();
+				printf(type, x);
+				return;
+			}
+			else if constexpr (std::is_same<std::remove_all_extents_t<T>, double>::value) {
+				string y = "%.";
+				y += to_string(precision);
+				y += "f";
+				type = y.c_str();
+				return;
 			}
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, std::string>::value) {
 				if constexpr (std::is_array<T>::value) {
