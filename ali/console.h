@@ -4,10 +4,12 @@
 #include <iterator>
 #include <type_traits>
 #include <Windows.h>
+#include <vector>
 #include "smart_queue.h"
 // Extras
 
 namespace ali{
+	using namespace std;
 	class Console {
 	public:
 		class smart_queue;
@@ -31,7 +33,7 @@ namespace ali{
 			white = 15,
 		};
 
-
+		// Formatted log section
 		template <class ... Ts>
 		void logf(Ts && ... inputs)
 		{
@@ -43,6 +45,36 @@ namespace ali{
 				} (), ...);
 		}
 
+		// Formatted log section -- Isn't same as formatted log!
+		template<typename T>
+		void flog(const std::vector<T>& data, const char* bef = "[", const char* aft = "]: ", const char* end = "\n")
+		{
+			size_t pos = 0;
+			for (size_t i = 0; i < data.size(); i++) {
+				logf(bef, pos, aft, data[i], end);
+				pos++;
+			}
+		}
+		
+		template<typename T>
+		void flog(const T& data, const char* bef = "[", const char* aft = "]: ", const char* end = "\n")
+		{
+			if constexpr (std::is_array<T>::value) {
+				size_t pos = 0;
+				for (const auto& x : data) {
+					logf(bef, pos, aft, x, end);
+					pos++;
+				}
+			}
+			else if constexpr (std::is_same<T, std::vector<T::value_type>>) {
+
+			}
+			else {
+				log("flog - error 01: input isn't an array!\n", red, black);
+			}
+		}
+
+		// Normal log section
 		template<typename T>
 		void log(const T& x) {
 			const char* type = "%s";
@@ -56,6 +88,10 @@ namespace ali{
 				type = "%i";
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value)
 				type = "%ld";
+			else if constexpr (std::is_same<std::remove_all_extents_t<T>, long long>::value)
+			{
+				type = "%lld";
+			}
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, float>::value || std::is_same<std::remove_all_extents_t<T>, double>::value) {
 				string y = "%.";
 				y += to_string(precision);
@@ -86,11 +122,27 @@ namespace ali{
 					printf(type, a);
 				}
 			}
-			else if constexpr (std::is_pointer<T>::value) {
+			else if constexpr (std::is_pointer<T>::value && !std::is_same<T, const char*>::value) { // Deafults "const char*"s to be printed as strings and not as pointers
 				printf("%p", x);
 			}
 			else {
 				printf(type, x);
+			}
+		}
+		template<typename T>
+		void log(const std::vector<T>& vec, size_t font, size_t background = colors::black)
+		{
+			for (size_t i = 0; i < vec.size(); i++)
+			{
+				log(vec[i], font, background);
+			}
+		}
+		template<typename T>
+		void log(const std::vector<T>& vec)
+		{
+			for (size_t i = 0; i < vec.size(); i++)
+			{
+				log(vec[i]);
 			}
 		}
 		template<typename T>
@@ -100,6 +152,7 @@ namespace ali{
 			SetConsoleTextAttribute(hConsole, 7);
 		}
 
+		// Queue section
 		template<typename T>
 		void enqueue(const T& data) {
 			if constexpr (!std::is_array<T>::value) {
@@ -115,7 +168,6 @@ namespace ali{
 				throw std::exception("Array at print enqueuing! Only primitives are allowed!");
 			}
 		}
-
 		template<typename T>
 		void enqueue_m(const T& data) {
 			if constexpr (!std::is_array<T>::value) {
@@ -133,6 +185,8 @@ namespace ali{
 			log(queue);
 			queue.clear();
 		}
+
+		// Constructors
 		Console() { };
 		~Console() { };
 		size_t precision = 6;
