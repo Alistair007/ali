@@ -10,8 +10,9 @@ int main()
 	ali::Timer cout;
 	for (size_t i = 0; i < times; i++)
 	{
-		ali::cout << i;
+		ali::qout << i;
 	}
+	ali::qout--;
 	cout.stop();
 	ali::Timer consoleLog;
 	for (size_t i = 0; i < times; i++)

@@ -209,6 +209,30 @@ namespace ali{
 	private:
 		Console myConsole;
 	};
+	class queue
+	{
+	public:
+		~queue() {
+			myConsole.dequeue();
+		}
+		template<typename T>
+		queue& operator<<(const T& x) {
+			myConsole.enqueue(x);
+			return *this;
+		}
+		void operator--()
+		{
+			myConsole.dequeue();
+		}
+		queue& operator--(int x)
+		{
+			myConsole.dequeue();
+			return *this;
+		}
+	private:
+		Console myConsole;
+	};
 	ostream cout;
+	queue qout;
 }
 ali::Console console;
