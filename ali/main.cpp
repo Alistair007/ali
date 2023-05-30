@@ -4,12 +4,7 @@
 
 int main()
 {
-	status_bar x(1000000, "test ");
-	while (true)
-	{
-		x.increase();
-		Sleep(100);
-	}
+	
 }
 
 //void printShowcase()

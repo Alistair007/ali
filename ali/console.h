@@ -100,7 +100,7 @@ namespace ali{
 				if constexpr (std::is_array<T>::value)
 				{
 					for (const auto& a : x)
-						printf(type, a);
+						log(a);
 				} else
 					printf(type, x);
 				return;
@@ -109,7 +109,7 @@ namespace ali{
 				if constexpr (std::is_array<T>::value) {
 					for (const auto& a : x)
 					{
-						printf(a.c_str());
+						log(a.c_str());
 					}
 				}
 				else 
@@ -119,7 +119,7 @@ namespace ali{
 			if constexpr (std::is_array<T>::value) {
 				for (const auto& a : x)
 				{
-					printf(type, a);
+					log(a);
 				}
 			}
 			else if constexpr (std::is_pointer<T>::value && !std::is_same<T, const char*>::value) { // Deafults "const char*"s to be printed as strings and not as pointers
