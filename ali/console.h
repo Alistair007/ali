@@ -198,5 +198,17 @@ namespace ali{
 	#define Colors Console::colors
 	#define COLOR_ERROR console::colors::black,console::colors::red
 	#define COLOR_SUCCESS console::colors::green,console::colors::black
+
+	class ostream {
+	public:
+		template<typename T>
+		ostream& operator<<(const T& x) {
+			myConsole.log(x);
+			return *this;
+		}
+	private:
+		Console myConsole;
+	};
+	ostream cout;
 }
 ali::Console console;

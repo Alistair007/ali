@@ -134,6 +134,7 @@
     <ClInclude Include="convert.h" />
     <ClInclude Include="cursor.h" />
     <ClInclude Include="gay.h" />
+    <ClInclude Include="keyboard.h" />
     <ClInclude Include="longlonglong.h" />
     <ClInclude Include="saved.h" />
     <ClInclude Include="smart_queue.h" />

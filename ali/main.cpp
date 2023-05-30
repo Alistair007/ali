@@ -1,15 +1,25 @@
-#include "smart_status_bar.h"
 #include "console.h"
+#include "timer.h"
+#include "smart_status_bar.h"
 #include <windows.h>
 
 int main()
 {
-	status_bar x(1000000, "test ");
-	while (true)
+	// Speed comparison
+	constexpr size_t times = 100000;
+	ali::Timer cout;
+	for (size_t i = 0; i < times; i++)
 	{
-		x.increase();
-		Sleep(100);
+		ali::cout << i;
 	}
+	cout.stop();
+	ali::Timer consoleLog;
+	for (size_t i = 0; i < times; i++)
+	{
+		console.log(i);
+	}
+	consoleLog.stop();
+	ali::cout << "\n" << cout.get_time<ali::milliseconds>().count() << " cout, " << consoleLog.get_time<ali::milliseconds>().count() << " console.log() ";
 }
 
 //void printShowcase()
