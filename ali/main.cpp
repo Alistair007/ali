@@ -5,22 +5,17 @@
 
 int main()
 {
-	// Speed comparison
-	constexpr size_t times = 100000;
-	ali::Timer cout;
+	constexpr int times = 100000;
 	for (size_t i = 0; i < times; i++)
 	{
-		ali::qout << i;
+		ali::vcout << std::to_string(i);
+		Sleep(0.01);
 	}
-	ali::qout--;
-	cout.stop();
-	ali::Timer consoleLog;
-	for (size_t i = 0; i < times; i++)
+	console.log("Finished!\n");
+	while (true)
 	{
-		console.log(i);
+
 	}
-	consoleLog.stop();
-	ali::cout << "\n" << cout.get_time<ali::milliseconds>().count() << " cout, " << consoleLog.get_time<ali::milliseconds>().count() << " console.log() ";
 }
 
 //void printShowcase()
