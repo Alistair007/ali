@@ -7,6 +7,11 @@ int main()
 {
 	std::wstring x = L"helo";
 	ali::cout << x;
+	{
+		console.log(i);
+	}
+	consoleLog.stop();
+	ali::cout << "\n" << cout.get_time<ali::milliseconds>().count() << " cout, " << consoleLog.get_time<ali::milliseconds>().count() << " console.log() ";
 }
 
 //void printShowcase()

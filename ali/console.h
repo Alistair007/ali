@@ -270,8 +270,47 @@ namespace ali{
 	private:
 		Console myConsole;
 	};
+	
+	class vostream
+	{
+	public:
+		vostream() {
+			new std::thread(
+				[&] {
+					Console myConsole;
+					while (!terminate)
+					{
+						if (content.empty())
+							continue;
+						myConsole.log(content.front());
+						content.pop();
+					}
+				}
+			);
+		}
+		~vostream() {
+			terminate = true;
+		}
+		template <typename T>
+		vostream& operator<<(const T& x)
+		{
+			if constexpr (std::is_same<T, std::string>::value)
+				content.push(x);
+			else if constexpr (std::is_integral<T>::value) // Idk
+				content.push(std::to_string(x));
+			else {
+				string y = x;
+				content.push(y);
+			}
+			return *this;
+		}
+	private:
+		std::queue<string> content;
+		bool terminate = false;
+	};
+
 	ostream cout;
-	qostream qout;
+	queue qout;
 }
 ali::Console console;
 
