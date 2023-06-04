@@ -5,7 +5,8 @@
 #include <type_traits>
 #include <Windows.h>
 #include <vector>
-#include "smart_queue.h"
+#include "queue.h"
+#include <thread>
 // Extras
 
 namespace ali{
@@ -88,6 +89,17 @@ namespace ali{
 				type = "%i";
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value)
 				type = "%ld";
+			else if constexpr (std::is_same<std::remove_all_extents_t<T>, const wchar_t*>::value)
+				type = "%ls";
+			else if (std::is_same<std::remove_all_extents_t<T>, wchar_t>::value) // Currently not working!!!
+			{
+				if constexpr (std::is_array<T>::value) {
+					for (const auto a : x)
+						printf("%lc", a);
+				}
+				else
+					printf("%lc", x);
+			}
 			else if constexpr (std::is_same<std::remove_all_extents_t<T>, long long>::value)
 			{
 				type = "%lld";
@@ -116,14 +128,40 @@ namespace ali{
 					printf(x.c_str());
 				return;
 			}
+			else if constexpr (std::is_same<std::remove_all_extents_t<T>, std::wstring>::value) {
+				if constexpr (std::is_array<T>::value) {
+					for (const auto& a : x)
+					{
+						log(a.c_str());
+					}
+				}
+				else
+					printf("%ls", x.c_str());
+				return;
+			}
 			if constexpr (std::is_array<T>::value) {
 				for (const auto& a : x)
 				{
 					log(a);
 				}
 			}
-			else if constexpr (std::is_pointer<T>::value && !std::is_same<T, const char*>::value) { // Deafults "const char*"s to be printed as strings and not as pointers
+			else if constexpr (std::is_pointer<T>::value && !std::is_same<T, const char*>::value && !std::is_same<T, const wchar_t*>::value) { // Deafults "const char*"s to be printed as strings and not as pointers
 				printf("%p", x);
+			}
+			else if constexpr (std::is_same<std::remove_all_extents<T>, bool>::value)
+			{
+				if constexpr (std::is_array<T>::value){
+					for (const auto& a : x)
+					{
+						log(a);
+					}
+				}
+				else {
+					if (x)
+						printf("true");
+					else
+						printf("false");
+				}
 			}
 			else {
 				printf(type, x);
@@ -209,14 +247,14 @@ namespace ali{
 	private:
 		Console myConsole;
 	};
-	class queue
+	class qostream
 	{
 	public:
-		~queue() {
+		~qostream() {
 			myConsole.dequeue();
 		}
 		template<typename T>
-		queue& operator<<(const T& x) {
+		qostream& operator<<(const T& x) {
 			myConsole.enqueue(x);
 			return *this;
 		}
@@ -224,7 +262,7 @@ namespace ali{
 		{
 			myConsole.dequeue();
 		}
-		queue& operator--(int x)
+		qostream& operator--(int x)
 		{
 			myConsole.dequeue();
 			return *this;
@@ -233,6 +271,54 @@ namespace ali{
 		Console myConsole;
 	};
 	ostream cout;
-	queue qout;
+	qostream qout;
 }
 ali::Console console;
+
+
+
+
+// Discarded section: I either can't get these things to work or i'm tired of doing them.
+
+//class vostream
+//{
+//public:
+//	vostream() {
+//		new thread(
+//			[&] {
+//				while (!done)
+//				{
+//					if (toPrint.empty()) {
+//						if (toKill) done = true;
+//						else continue;
+//					}
+//					if (!toPrint.empty())
+//						myConsole.log(toPrint.front());
+//					toPrint.pop();
+//				}
+//				printf("Finished thread!\n");
+//			}
+//		);
+//	}
+//	~vostream() {
+//		// Should make this turnable off
+//		printf("Attempting to delete!\n");
+//		toKill = true;
+//		while (true)
+//		{
+//			if (toPrint.empty() && !done)
+//				break;
+//			// Wait
+//		}
+//		printf("Deleted vostream!\n");
+//	}
+//	vostream& operator<<(std::string data)
+//	{
+//		toPrint.push(data);
+//	}
+//private:
+//	queue<std::string> toPrint;
+//	bool done = false;
+//	bool toKill = false;
+//	Console myConsole;
+//};
