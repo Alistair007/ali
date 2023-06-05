@@ -115,7 +115,7 @@ namespace ali{
 			x += "f";
 			printf(x.c_str(), data);
 		}
-		void log(const std::string& data)
+		void log(std::string data)
 		{
 			printf(data.c_str());
 		}
