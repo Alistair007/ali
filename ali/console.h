@@ -76,69 +76,65 @@ namespace ali{
 		}
 
 		// Normal log section
+		void log(const char* data)
+		{
+			printf(data);
+		}
+		void log(char* data)
+		{
+			printf(data);
+		}
+		void log(const char& value)
+		{
+			printf("%c", value);
+		}
+		void log(const int& data)
+		{
+			printf("%d", data);
+		}
+		void log(const unsigned int& data)
+		{
+			printf("%ld", data);
+		}
+		void log(const size_t& data)
+		{
+			printf("%ld", data);
+		}
+		void log(const wchar_t* data)
+		{
+			printf("%ls", data);
+		}
+		void log(const long long& data)
+		{
+			printf("%lld", data);
+		}
+		void log(const float& data)
+		{
+			string x = "%.";
+			x += to_string(precision);
+			x += "f";
+			printf(x.c_str(), data);
+		}
+		void log(const std::string& data)
+		{
+			printf(data.c_str());
+		}
+		void log(const std::wstring& data)
+		{
+			printf("%ls", data.c_str());
+		}
+		void log(const bool& data)
+		{
+			if (data)
+			{
+				printf("true");
+				return;
+			}
+			printf("false");
+		}
+
 		template<typename T>
 		void log(const T& x) {
-			const char* type = "%s";
-			if constexpr (std::is_same<std::remove_all_extents_t<T>, char*>::value || std::is_same<std::remove_all_extents_t<T>, const char*>::value)
-				type = "%s";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, const wchar_t*>::value)
-				type = "%ls";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, char>::value)
-				type = "%c";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, int>::value)
-				type = "%i";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, unsigned int>::value || std::is_same<std::remove_all_extents_t<T>, size_t>::value)
-				type = "%ld";
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, const wchar_t*>::value)
-				type = "%ls";
-			else if (std::is_same<std::remove_all_extents_t<T>, wchar_t>::value) // Currently not working!!!
-			{
-				if constexpr (std::is_array<T>::value) {
-					for (const auto a : x)
-						printf("%lc", a);
-				}
-				else
-					printf("%lc", x);
-			}
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, long long>::value)
-			{
-				type = "%lld";
-			}
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, float>::value || std::is_same<std::remove_all_extents_t<T>, double>::value) {
-				string y = "%.";
-				y += to_string(precision);
-				y += "f";
-				type = y.c_str();
-				if constexpr (std::is_array<T>::value)
-				{
-					for (const auto& a : x)
-						log(a);
-				} else
-					printf(type, x);
-				return;
-			}
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, std::string>::value) {
-				if constexpr (std::is_array<T>::value) {
-					for (const auto& a : x)
-					{
-						log(a.c_str());
-					}
-				}
-				else 
-					printf(x.c_str());
-				return;
-			}
-			else if constexpr (std::is_same<std::remove_all_extents_t<T>, std::wstring>::value) {
-				if constexpr (std::is_array<T>::value) {
-					for (const auto& a : x)
-					{
-						log(a.c_str());
-					}
-				}
-				else
-					printf("%ls", x.c_str());
-				return;
-			}
 			if constexpr (std::is_array<T>::value) {
 				for (const auto& a : x)
 				{
@@ -148,23 +144,8 @@ namespace ali{
 			else if constexpr (std::is_pointer<T>::value && !std::is_same<T, const char*>::value && !std::is_same<T, const wchar_t*>::value) { // Deafults "const char*"s to be printed as strings and not as pointers
 				printf("%p", x);
 			}
-			else if constexpr (std::is_same<std::remove_all_extents<T>, bool>::value)
-			{
-				if constexpr (std::is_array<T>::value){
-					for (const auto& a : x)
-					{
-						log(a);
-					}
-				}
-				else {
-					if (x)
-						printf("true");
-					else
-						printf("false");
-				}
-			}
 			else {
-				printf(type, x);
+				log("Unknown type!", black, red);
 			}
 		}
 		template<typename T>
@@ -270,47 +251,9 @@ namespace ali{
 	private:
 		Console myConsole;
 	};
-	
-	class vostream
-	{
-	public:
-		vostream() {
-			new std::thread(
-				[&] {
-					Console myConsole;
-					while (!terminate)
-					{
-						if (content.empty())
-							continue;
-						myConsole.log(content.front());
-						content.pop();
-					}
-				}
-			);
-		}
-		~vostream() {
-			terminate = true;
-		}
-		template <typename T>
-		vostream& operator<<(const T& x)
-		{
-			if constexpr (std::is_same<T, std::string>::value)
-				content.push(x);
-			else if constexpr (std::is_integral<T>::value) // Idk
-				content.push(std::to_string(x));
-			else {
-				string y = x;
-				content.push(y);
-			}
-			return *this;
-		}
-	private:
-		std::queue<string> content;
-		bool terminate = false;
-	};
 
 	ostream cout;
-	queue qout;
+	qostream qout;
 }
 ali::Console console;
 
