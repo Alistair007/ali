@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="colors.h" />
     <ClInclude Include="console.h" />
     <ClInclude Include="convert.h" />
     <ClInclude Include="cursor.h" />

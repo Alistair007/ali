@@ -3,7 +3,7 @@
 #include "console.h"
 namespace ali
 {
-	class status_bar
+	class status_bar // Super shitty
 	{
 	public:
 		status_bar(size_t completion, const char* barName, size_t precision = 10) {
@@ -37,6 +37,7 @@ namespace ali
 
 		void statusListener()
 		{
+			printf("\033[?25l");
 			while (!finished)
 			{
 				myConsole.logf('\r', barName, '[');
@@ -50,6 +51,7 @@ namespace ali
 				}
 				myConsole.logf("] - ", (float)status / length * 100, "% ");
 			}
+			printf("\033[?25h");
 		}
 	private:
 		const char* barName = "";

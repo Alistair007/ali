@@ -45,6 +45,16 @@ namespace ali{
 		{
 			return sSize;
 		}
+		template<typename Function>
+		void for_every(Function func) // Function can be of any return type, but it must take one parameter of same type as the object
+		{
+			queue* saved = this->next;
+			for (size_t i = 0; i < sSize; i++)
+			{
+				func(saved->value);
+				saved = saved->next;
+			}
+		}
 	private:
 		queue* next = nullptr;
 		queue* last = this;

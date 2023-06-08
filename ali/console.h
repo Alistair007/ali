@@ -1,5 +1,5 @@
 #pragma once
-#include <iostream>
+#include <stdio.h>
 #include <string>
 #include <iterator>
 #include <type_traits>
@@ -11,29 +11,10 @@
 
 namespace ali{
 	using namespace std;
+	class ostream;
+	class qostream;
 	class Console {
 	public:
-		class smart_queue;
-
-		static enum colors {
-			black = 0,
-			electric = 1,
-			leaf = 2,
-			lightblue = 3,
-			red = 4,
-			darkpurple = 5,
-			gold = 6,
-			lightgrey = 7,
-			grey = 8,
-			blue = 9,
-			green = 10,
-			aqua = 11,
-			lightred = 12,
-			purple = 13,
-			yellow = 14,
-			white = 15,
-		};
-
 		// Formatted log section
 		template <class ... Ts>
 		void logf(Ts && ... inputs)
@@ -41,14 +22,14 @@ namespace ali{
 			int i = 0;
 			([&]
 				{
-					++i; // i is the current place
+					i++; // i is the current place
 					log(inputs);
 				} (), ...);
 		}
 
-		// Formatted log section -- Isn't same as formatted log!
+		// Array log
 		template<typename T>
-		void flog(const std::vector<T>& data, const char* bef = "[", const char* aft = "]: ", const char* end = "\n")
+		void alog(const std::vector<T>& data, const char* bef = "[", const char* aft = "]: ", const char* end = "\n")
 		{
 			size_t pos = 0;
 			for (size_t i = 0; i < data.size(); i++) {
@@ -56,9 +37,8 @@ namespace ali{
 				pos++;
 			}
 		}
-		
 		template<typename T>
-		void flog(const T& data, const char* bef = "[", const char* aft = "]: ", const char* end = "\n")
+		void alog(const T& data, const char* bef = "[", const char* aft = "]: ", const char* end = "\n")
 		{
 			if constexpr (std::is_array<T>::value) {
 				size_t pos = 0;
@@ -71,7 +51,7 @@ namespace ali{
 
 			}
 			else {
-				log("flog - error 01: input isn't an array!\n", red, black);
+				log("flog - error 01: input isn't an array!\n", 0xff0000, 0x0c0c0c);
 			}
 		}
 
@@ -132,7 +112,6 @@ namespace ali{
 			}
 			printf("false");
 		}
-
 		template<typename T>
 		void log(const T& x) {
 			if constexpr (std::is_array<T>::value) {
@@ -145,11 +124,11 @@ namespace ali{
 				printf("%p", x);
 			}
 			else {
-				log("Unknown type!", black, red);
+				log("Unknown type!", 0x0c0c0c, 0xff0000);
 			}
 		}
 		template<typename T>
-		void log(const std::vector<T>& vec, size_t font, size_t background = colors::black)
+		void log(const std::vector<T>& vec, size_t font, size_t background = 0x0c0c0c)
 		{
 			for (size_t i = 0; i < vec.size(); i++)
 			{
@@ -165,10 +144,17 @@ namespace ali{
 			}
 		}
 		template<typename T>
-		void log(const T& x, size_t font, size_t background = colors::black) {
-			SetConsoleTextAttribute(hConsole, background * 16 + font);
-			log(x);
-			SetConsoleTextAttribute(hConsole, 7);
+		void log(const T& text, int fontColorCode, int backgroundColorCode = 0x0c0c0c) {
+			printf("\033[38;2;%d;%d;%dm\033[48;2;%d;%d;%dm", (fontColorCode >> 16) & 0xFF, (fontColorCode >> 8) & 0xFF, fontColorCode & 0xFF, (backgroundColorCode >> 16) & 0xFF, (backgroundColorCode >> 8) & 0xFF, backgroundColorCode & 0xFF);
+			log(text);
+			printf("\033[0m"); // Reset formatting to default
+		}
+		template<typename T>
+		void log(const T& text, int fontR, int fontG, int fontB, int bgR = 12, int bgG = 12, int bgB = 12) // Suggested, faster than hex
+		{
+			printf("\033[38;2;%d;%d;%dm\033[48;2;%d;%d;%dm", fontR & 0xFF, fontG & 0xFF, fontB & 0xFF, bgR & 0xFF, bgG & 0xFF, bgB & 0xFF);
+			log(text);
+			printf("\033[0m"); // Reset formatting to default
 		}
 
 		// Queue section
@@ -215,8 +201,8 @@ namespace ali{
 	};
 
 	#define Colors Console::colors
-	#define COLOR_ERROR console::colors::black,console::colors::red
-	#define COLOR_SUCCESS console::colors::green,console::colors::black
+	#define COLOR_ERROR console::colors::0x0c0c0c,console::colors::0xff0000
+	#define COLOR_SUCCESS console::colors::green,console::colors::0x0c0c0c
 
 	class ostream {
 	public:
@@ -260,7 +246,7 @@ ali::Console console;
 
 
 
-// Discarded section: I either can't get these things to work or i'm tired of doing them.
+// Discarded section: I either can't get these things to work or i'm ti0xff0000 of doing them.
 
 //class vostream
 //{
