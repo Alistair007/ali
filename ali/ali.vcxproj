@@ -137,12 +137,14 @@
     <ClInclude Include="gay.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="longlonglong.h" />
+    <ClInclude Include="multiple-consoles.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="saved.h" />
     <ClInclude Include="smart_queue.h" />
     <ClInclude Include="smart_status_bar.h" />
     <ClInclude Include="status_bar.h" />
     <ClInclude Include="timer.h" />
+    <ClInclude Include="type_traits.h" />
     <ClInclude Include="variable.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>

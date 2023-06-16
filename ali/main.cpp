@@ -1,25 +1,20 @@
 #include "console.h"
 #include "colors.h"
 #include "timer.h"
+#include "multiple-consoles.h"
+#include "type_traits.h"
 
 #include <iostream>
 
+template<typename T>
+bool check(T data)
+{
+	return ali::is_vector<T>::value;
+}
+
 int main()
 {
-	const size_t times = 10000;
-	ali::Timer rb;
-	for (size_t i = 0; i < times; i++)
-	{
-		console.log(i, 255, 0, 0);
-	}
-	rb.stop();
-	ali::Timer hx;
-	for (size_t i = 0; i < times; i++)
-	{
-		console.log(i, 0xff0000);
-	}
-	hx.stop();
-	ali::cout << "\nHEX: " << hx.get_time<ali::milliseconds>().count() << "\nRGB: " << rb.get_time<ali::milliseconds>().count();
+	
 }
 
 //void printShowcase()

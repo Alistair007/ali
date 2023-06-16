@@ -6,7 +6,7 @@ namespace ali {
 			return (r << 16) | (g << 8) | b;
 		}
 		namespace windows {
-			static enum colors {
+			enum colors {
 				black = 0x0c0c0c,
 				electric = 0x0037da,
 				leaf = 0x13a10e,
