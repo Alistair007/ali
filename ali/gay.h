@@ -22,11 +22,11 @@ using namespace std;
 #define def auto
 #define func {
 #define say std::cout <<
+#define sayl(text) std::cout << #text "\n"
 #define saytoo <<
 #define ask std::cin >>
 #define forr(name) for (size_t name = 0
-#define inrange(name, range) ; name < range; name++
-#define for_in_range(name, range) for (size_t name = 0; name < range; name++
+#define fortimes(times) for (size_t __priv = 0; __priv < times; __priv++){
 #define addelement(e) .push_back(e);
 #define at(i) [i] 
 

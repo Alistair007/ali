@@ -3,7 +3,6 @@
 #include <vector>
 #include <map>
 #include <Windows.h>
-#include "convert.h" // TODO: not use this
 
 namespace ali
 {
@@ -22,13 +21,20 @@ namespace ali
 
 
 		namespace raw {
+			string to_str(wstring wstr)
+			{
+				return string(wstr.begin(), wstr.end());
+			}
+
+			wstring to_wstr(string str)
+			{
+				return wstring(str.begin(), str.end());
+			}
 			void writeFile(string section, string variable, string value, string path = iniPath() + "\\settings.ini") {
-				using namespace ali::convert;
 				WritePrivateProfileString(to_wstr(section).c_str(), to_wstr(variable).c_str(), to_wstr(value).c_str(), to_wstr(path).c_str());
 			}
 			string readFile(string section, string variable, string path = iniPath() + "\\settings.ini") {
 				wchar_t txt[500];
-				using namespace ali::convert;
 				GetPrivateProfileString(to_wstr(section).c_str(), to_wstr(variable).c_str(), NULL, txt, ARRAYSIZE(txt), to_wstr(path).c_str());
 				wstring ws(txt);
 				return string(ws.begin(), ws.end());

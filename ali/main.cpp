@@ -1,16 +1,8 @@
 #include "console.h"
-#include "colors.h"
-#include "timer.h"
-#include "multiple-consoles.h"
-#include "type_traits.h"
+#include "gay.h"
 
 #include <iostream>
 
-template<typename T>
-bool check(T data)
-{
-	return ali::is_vector<T>::value;
-}
 
 int main()
 {

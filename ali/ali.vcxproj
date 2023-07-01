@@ -90,7 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="bool_pack.h" />
     <ClInclude Include="colors.h" />
     <ClInclude Include="console.h" />
     <ClInclude Include="convert.h" />
@@ -143,6 +144,7 @@
     <ClInclude Include="smart_queue.h" />
     <ClInclude Include="smart_status_bar.h" />
     <ClInclude Include="status_bar.h" />
+    <ClInclude Include="string_operations.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="type_traits.h" />
     <ClInclude Include="variable.h" />

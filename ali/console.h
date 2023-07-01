@@ -30,6 +30,17 @@ public:
 				log(inputs);
 			} (), ...);
 	}
+	template <class ... Ts>
+	void logff(Ts && ... inputs) // Suggested. Faster but may interfere with the queue
+	{
+		int i = 0;
+		([&]
+			{
+				i++; // i is the current place
+				enqueue(inputs);
+			} (), ...);
+		dequeue();
+	}
 
 	// Pretty log
 #if _JAVASCRIPT_STYLE_LOGGING
@@ -61,21 +72,7 @@ public:
 	template<typename T>
 	void plog(const std::vector<T>& data, std::string indent = "") // Vectors will wait
 	{
-		//log(indent);
-		//size_t size = data.size();
-		//logf('(', size, ") [");
-		//if constexpr (is_vector_multidimensional<T>::value) {
-		//	log('\n');
-		//	indent += "   ";
-		//}
-		//for (size_t i = 0; i < size; i++)
-		//{
-		//	log(indent);
-		//	plog(data[i]);
-		//	log(", ");
-		//	if constexpr (is_vector_multidimensional<T>::value) log('\n');
-		//}
-		//log("\b\b]");
+		log("Pretty vector logging isn't currently supported!\n", 0, 0, 0, 255, 0, 0);
 	}
 #else
 	template<typename T>
@@ -193,7 +190,7 @@ public:
 			log(vec[i]);
 		}
 	}
-	template<typename T>
+	template<typename T> 
 	void log(const T& text, int fontColorCode, int backgroundColorCode = 0x0c0c0c) {
 		printf("\033[38;2;%d;%d;%dm\033[48;2;%d;%d;%dm", (fontColorCode >> 16) & 0xFF, (fontColorCode >> 8) & 0xFF, fontColorCode & 0xFF, (backgroundColorCode >> 16) & 0xFF, (backgroundColorCode >> 8) & 0xFF, backgroundColorCode & 0xFF);
 		log(text);
@@ -257,7 +254,17 @@ public:
 		x += "m";
 		return x;
 	}
-
+	static std::string background_color(short r, short g, short b)
+	{
+		std::string x = "\033[48;2;";
+		x += std::to_string(r);
+		x += ";";
+		x += std::to_string(g);
+		x += ";";
+		x += std::to_string(b);
+		x += "m";
+		return x;
+	}
 private:
 	std::string queue;
 	const HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -273,6 +280,8 @@ private:
 #define Colors Console::colors
 #define COLOR_ERROR console::colors::0x0c0c0c,console::colors::0xff0000
 #define COLOR_SUCCESS console::colors::green,console::colors::0x0c0c0c
+#define FONT_COLOR_COMPTIME(r,g,b) "\033[38;2;" #r ";" #g ";" #b "m"
+#define BACKGROUND_COLOR_COMPTIME(r,g,b) "\033[48;2;" #r ";" #g ";" #b "m"
 
 class ostream {
 public:
@@ -327,9 +336,9 @@ void fplog_helper(const char* name, const T& data)
 {
 	ali::Console myConsole;
 	if constexpr (!std::is_array<T>::value)
-		myConsole.logf(ali::Console::font_color(0, 255, 0), typeid(T).name(), ' ', name, ali::Console::font_color(0xcc, 0xcc, 0xcc), " = ", data, '\n');
+		myConsole.logf(FONT_COLOR_COMPTIME(0, 255, 0), typeid(T).name(), ' ', name, FONT_COLOR_COMPTIME(0xcc, 0xcc, 0xcc), " = ", data, '\n');
 	else {
-		myConsole.logf(ali::Console::font_color(0, 255, 0), typeid(T).name(), ' ', name, ali::Console::font_color(0xcc, 0xcc, 0xcc), ": \n"); // Idk if i want to keep \n\n or just put \n...
+		myConsole.logf(FONT_COLOR_COMPTIME(0, 255, 0), typeid(T).name(), ' ', name, FONT_COLOR_COMPTIME(0xcc, 0xcc, 0xcc), ": \n"); // Idk if i want to keep \n\n or just put \n...
 		myConsole.plog(data);
 		myConsole.log('\n');
 	}
@@ -340,9 +349,9 @@ void fplog_helper(const char* name, const T& data)
 {
 	ali::Console myConsole;
 	if constexpr (!std::is_array<T>::value)
-		myConsole.logf(ali::Console::font_color(0, 255, 0), typeid(T).name(), ' ', name, ali::Console::font_color(0xcc, 0xcc, 0xcc), " = ", data);
+		myConsole.logf(FONT_COLOR_COMPTIME(0, 255, 0), typeid(T).name(), ' ', name, FONT_COLOR_COMPTIME(0xcc, 0xcc, 0xcc), " = ", data);
 	else {
-		myConsole.logf(ali::Console::font_color(0, 255, 0), typeid(T).name(), ' ', name, ali::Console::font_color(0xcc, 0xcc, 0xcc), ": \n"); // Idk if i want to keep \n\n or just put \n...
+		myConsole.logf(FONT_COLOR_COMPTIME(0, 255, 0), typeid(T).name(), ' ', name, FONT_COLOR_COMPTIME(0xcc, 0xcc, 0xcc), ": \n"); // Idk if i want to keep \n\n or just put \n...
 		myConsole.plog(data, "   [");
 	}
 }
