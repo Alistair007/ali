@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <Windows.h>
+#include <thread>
 
 namespace ali
 {

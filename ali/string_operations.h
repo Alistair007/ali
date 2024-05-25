@@ -49,4 +49,16 @@ namespace str {
 	}
 }
 
+template <class ... Ts>
+void flogf(Ts && ... inputs) // Suggested. Faster but may interfere with the queue
+{
+	string pr = "";
+	([&]
+		{
+			i++; // i is the current place
+			str::add(pr, inputs);
+		} (), ...);
+	printf(pr.c_str());
+}
+
 _ALI_END

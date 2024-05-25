@@ -9,11 +9,24 @@
 // Extras
 
 #define _JAVASCRIPT_STYLE_LOGGING true
+#define _EXTRA_DETAIL true
+#define _ALL_ALI true
+
+#ifdef _ALL_ALI
+#include "async.h"
+#endif // _ALL_ALI
+
 
 #define _ALI_BEGIN namespace ali{
 #define _ALI_END }
 
 _ALI_BEGIN
+
+template<typename _Err>
+concept is_error_what = requires {
+	_Err::what();
+};
+
 using namespace std;
 class ostream;
 class qostream;
@@ -29,17 +42,6 @@ public:
 				i++; // i is the current place
 				log(inputs);
 			} (), ...);
-	}
-	template <class ... Ts>
-	void logff(Ts && ... inputs) // Suggested. Faster but may interfere with the queue
-	{
-		int i = 0;
-		([&]
-			{
-				i++; // i is the current place
-				enqueue(inputs);
-			} (), ...);
-		dequeue();
 	}
 
 	// Pretty log
@@ -125,7 +127,12 @@ public:
 	}
 	void log(const size_t& data)
 	{
+#if _EXTRA_DETAIL
+		if (data == (unsigned long long) - 1) printf("(max unsigned long long)");
+		else printf("%zu", data);
+#else
 		printf("%zu", data);
+#endif // _EXTRA_DETAIL
 	}
 	void log(const wchar_t* data)
 	{
@@ -159,6 +166,16 @@ public:
 		}
 		printf("false");
 	}
+#ifdef _ALL_ALI
+	//template<typename T>
+	//void log(ali::promise<T> data) {
+	//	if (data.finished()) {
+	//		logf("(promised)", data.get());
+	//	} else 
+	//	printf("%s%s%c","ali::promise<", typeid(T).name(), '>');
+	//}
+#endif // _ALL_ALI
+
 	template<typename T>
 	void log(const T& x) {
 		if constexpr (std::is_array<T>::value) {
@@ -202,6 +219,17 @@ public:
 		printf("\033[38;2;%d;%d;%dm\033[48;2;%d;%d;%dm", fontR & 0xFF, fontG & 0xFF, fontB & 0xFF, bgR & 0xFF, bgG & 0xFF, bgB & 0xFF);
 		log(text);
 		printf("\033[0m"); // Reset formatting to default
+	}
+
+	template<typename T>
+	void error(const T& e) {
+		log(e, 0, 0, 0, 255, 0, 0);
+	}
+
+	template<typename _Err>
+	requires is_error_what<_Err>
+	void error(const _Err& e) {
+		log(e.what(), 0, 0, 0, 255, 0, 0);
 	}
 
 	// Queue section
@@ -275,6 +303,27 @@ private:
 		static constexpr bool value =
 			std::is_array<std::remove_extent<T>::type>::value;
 	};
+	template<typename T>
+	static void add(string& s, T adder) {
+		if constexpr (is_integral<T>::value) {
+			s += to_string(adder);
+		}
+		else if constexpr (is_floating_point<T>::value) {
+			s += to_string(adder);
+		}
+		else if constexpr (is_same<T, wstring>::value) {
+			string conv = string(adder.begin(), adder.end());
+			s += conv;
+		}
+		else if constexpr (is_same<T, const wchar_t*>::value) {
+			wstring med = adder;
+			string conv = string(med.begin(), med.end());
+			s += conv;
+		}
+		else {
+			s += adder;
+		}
+	}
 };
 
 #define Colors Console::colors
@@ -288,6 +337,23 @@ public:
 	template<typename T>
 	ostream& operator<<(const T& x) {
 		myConsole.log(x);
+		return *this;
+	}
+	template<typename T>
+	void type(const T& type) {
+		myConsole.log(typeid(T).name());
+	}
+private:
+	Console myConsole;
+};
+class eostream {
+public:
+	template<typename T>
+	eostream& operator<<(const T& x) {
+		std::string full = FONT_COLOR_COMPTIME(0, 0, 0) BACKGROUND_COLOR_COMPTIME(255, 0, 0);
+		full += x;
+		full += "\033[0m";
+		myConsole.log(full.c_str());
 		return *this;
 	}
 private:
@@ -318,6 +384,7 @@ private:
 };
 
 ostream cout;
+eostream cerr;
 qostream qout;
 
 void fprint(const char* text)
@@ -356,6 +423,12 @@ void fplog_helper(const char* name, const T& data)
 	}
 }
 #endif // _JAVASCRIPT_STYLE_LOGGING
+
+void fplog_helper(const char* name, const std::string& str)
+{
+	ali::Console myConsole;
+	myConsole.logf("std::string ", name, " = ", str, "\n    .length() = ", str.length());
+}
 
 
 #define fplog(data) fplog_helper(#data, std::cref(data).get())

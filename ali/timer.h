@@ -22,7 +22,7 @@ namespace ali {
 
 		}
 		template<typename T>
-		auto time_passed()
+		auto current_time()
 		{
 			return duration_cast<T>(high_resolution_clock::now() - begin);
 		}
