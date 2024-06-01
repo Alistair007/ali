@@ -113,41 +113,13 @@ public:
 	{
 		printf(data);
 	}
-	void log(const char& value)
+	void log(const char value)
 	{
 		printf("%c", value);
-	}
-	void log(const int& data)
-	{
-		printf("%d", data);
-	}
-	void log(const unsigned int& data)
-	{
-		printf("%ld", data);
-	}
-	void log(const size_t& data)
-	{
-#if _EXTRA_DETAIL
-		if (data == (unsigned long long) - 1) printf("(max unsigned long long)");
-		else printf("%zu", data);
-#else
-		printf("%zu", data);
-#endif // _EXTRA_DETAIL
 	}
 	void log(const wchar_t* data)
 	{
 		printf("%ls", data);
-	}
-	void log(const long long& data)
-	{
-		printf("%lld", data);
-	}
-	void log(const float& data)
-	{
-		string x = "%.";
-		x += to_string(precision);
-		x += "f";
-		printf(x.c_str(), data);
 	}
 	void log(std::string data)
 	{
@@ -157,7 +129,7 @@ public:
 	{
 		printf("%ls", data.c_str());
 	}
-	void log(const bool& data)
+	void log(const bool data)
 	{
 		if (data)
 		{
@@ -183,13 +155,32 @@ public:
 			{
 				log(a);
 			}
+			return;
 		}
-		else if constexpr (std::is_pointer<T>::value && !std::is_same<T, const char*>::value && !std::is_same<T, const wchar_t*>::value) { // Deafults "const char*"s to be printed as strings and not as pointers
+		if constexpr (std::is_pointer<T>::value && !std::is_same<T, const char*>::value && !std::is_same<T, const wchar_t*>::value) { // Deafults "const char*"s to be printed as strings and not as pointers
 			printf("%p", x);
+			return;
 		}
-		else {
-			log("Unknown type!", 0x0c0c0c, 0xff0000);
+		if constexpr (std::is_integral<T>::value) {
+#if _EXTRA_DETAIL
+			if constexpr (std::is_unsigned<T>::value) {
+				if (x == -1) printf("(max unsigned value)");
+				else printf("%d", x);
+				return;
+			}
+#endif // _EXTRA_DETAIL
+
+			printf("%d", x);
+			return;
 		}
+		if constexpr (std::is_floating_point<T>::value) {
+			string f = "%.";
+			f += to_string(precision);
+			f += "f";
+			printf(f.c_str(), x);
+			return;
+		}
+		log("Unknown type!", 0x0c0c0c, 0xff0000);
 	}
 	template<typename T>
 	void log(const std::vector<T>& vec, size_t font, size_t background = 0x0c0c0c)

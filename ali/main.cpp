@@ -7,37 +7,37 @@
 using ali::cout;
 
 template<typename T>
-void printTv(const tv<T>& v) {
-	cout << "size: " << v.s_size << "\ncapacity: " << v.s_capacity << "\ncurrentPtr: " << v.s_currentPtr << "\ncurrentPtrSize: " << v.s_currentPtrSize << "\nptrs[0][0]: " << v.ptrs[0][0];
+void logTv(const tv<T>& v) {
+	for (size_t i = 0; i < v.size(); i++) {
+		console.logf(i, ": ", v[i], '\n');
+	}
 }
 
-template<typename T>
-void printTvData(const tv<T>& v) {
-	size_t capacity = 2;
-	size_t point = 0;
-	for (size_t i = 0; i <= v.s_currentPtr; i++)
-	{
-		for (size_t k = 0; k < capacity; k++) {
-			cout << i << ' ' << k << ": " << v.ptrs[i][k] << '\n';
-			point++;
-			if (point == v.s_size) break;
-		}
-		capacity *= 2;
-	}
+inline unsigned short f_getBaseByIndex(size_t index) {
+	return log2_64_f(index + 2) - 1;
+}
+
+inline unsigned short f_getIndexByIndex(size_t index) {
+	return index - (1ULL << (log2_64_f(index + 2))) + 2;
 }
 
 int main() {
 	tv<int> x;
-	for (size_t i = 0; i < 10000; i++)
-		x.push_back(i);
+	
+	x += 123;
 
-	/*printTvData(x);*/
+	x += 1233;
+
+	x += 32;
+
+	x--;
+	x--;
+	x--;
+
+	logTv(x);
 
 	return 0;
 }
-
-
-
 
 
 
