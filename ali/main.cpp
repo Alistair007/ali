@@ -1,40 +1,17 @@
 #include "timer.h"
 #include "console.h"
-#include "testingVec.h"
+#include "async.h"
 #include <iostream>
 #include <windows.h>
 
 using ali::cout;
 
-template<typename T>
-void logTv(const tv<T>& v) {
-	for (size_t i = 0; i < v.size(); i++) {
-		console.logf(i, ": ", v[i], '\n');
-	}
-}
-
-inline unsigned short f_getBaseByIndex(size_t index) {
-	return log2_64_f(index + 2) - 1;
-}
-
-inline unsigned short f_getIndexByIndex(size_t index) {
-	return index - (1ULL << (log2_64_f(index + 2))) + 2;
-}
-
 int main() {
-	tv<int> x;
-	
-	x += 123;
-
-	x += 1233;
-
-	x += 32;
-
-	x--;
-	x--;
-	x--;
-
-	logTv(x);
+	ali::async<int(std::string&)> x([](std::string& x) -> int {
+		return x[0];
+		});
+	std::string y = "Hekki";
+	cout << x(y).await();
 
 	return 0;
 }

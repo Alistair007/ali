@@ -213,6 +213,16 @@ public:
 	}
 
 	template<typename T>
+	void logType(const T& x) {
+		log(typeid(T).name());
+	}
+
+	template<typename T>
+	void logType() {
+		log(typeid(T).name());
+	}
+
+	template<typename T>
 	void error(const T& e) {
 		log(e, 0, 0, 0, 255, 0, 0);
 	}

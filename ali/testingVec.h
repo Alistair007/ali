@@ -11,7 +11,7 @@ const int tab64[64] = {
 	56, 45, 25, 31, 35, 16,  9, 12,
 	44, 24, 15,  8, 23,  7,  6,  5 };
 
-int log2_64_f(uint64_t value)
+int log2_64_f(uint64_t value) // O(1)
 {
 	if (value == 0 || value == 1) return 0;
 	value |= value >> 1;

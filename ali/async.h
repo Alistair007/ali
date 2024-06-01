@@ -4,6 +4,11 @@
 #include <stdexcept>
 #include <iostream>
 
+#define _ALI_BEGIN namespace ali{
+#define _ALI_END }
+
+_ALI_BEGIN
+
 template <typename T>
 struct return_type;
 
@@ -63,7 +68,7 @@ public:
 	}
 
 	template<typename... _Args>
-	promise<Return> operator()(_Args&&... args) {
+	promise<Return> operator()(_Args... args) {
 		bool* f = new bool(false);
 		Return* rv = new Return(0);
 		std::thread* t = new std::thread([](_Func(*fun), _Args... a, bool* finished, Return* retVal) {
@@ -75,3 +80,5 @@ public:
 private:
 	_Func(*func);
 };
+
+_ALI_END
