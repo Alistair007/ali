@@ -1,130 +1,77 @@
 #pragma once
+#include <type_traits>
 #include <thread>
+#include <stdexcept>
+#include <iostream>
 
-//template<typename _Func, typename _Args>
-//class promise
-//{
-//public:
-//	promise(_Func(*Func), _Args&&... Args_) {
-//		Func(Args_...);
-//	}
-//	~promise();
-//
-//private:
-//
-//};
-//
-//template<typename _Func>
-//class async
-//{
-//public:
-//	async(_Func&& Func_) {
-//		Func = _Func;
-//	}
-//	
-//	template<typename _Args>
-//	promise<_Func, _Args> operator()(_Args&&... Args_) {
-//		return promise<_Func, _Args>(Args_);
-//	}
-//private:
-//	_Func Func;
-//};
+template <typename T>
+struct return_type;
 
-//#include <Windows.h>
-//#include <condition_variable>
-//#include <type_traits>
-//#include <functional>
-//
-//#define _ALI_BEGIN namespace ali{
-//#define _ALI_END }
-//
-//_ALI_BEGIN
-//template<typename T>
-//class promise
-//{
-//public:
-//	promise(std::function<T()> func) {
-//		thread = new std::thread([&] {
-//			value = func();
-//			done = true;
-//			});
-//	}
-//	//~promise();
-//	T await() {
-//		thread->join();
-//		return value;
-//	}
-//	bool finished() {
-//		return done;
-//	}
-//	T get() {
-//		if (done)
-//			return value;
-//		else throw("Didn't finish the task!");
-//	}
-//private:
-//	std::thread* thread = nullptr;
-//	bool done = false;
-//	T value;
-//};
-//
-//
-//template<typename T>
-//class async
-//{
-//public:
-//	template<typename Func, typename... Args>
-//	async(Func&& func, Args&&... args) {
-//		// Use std::bind to create a callable object from the provided function and arguments
-//		auto bound_func = std::bind(std::forward<Func>(func), std::forward<Args>(args)...);
-//
-//		this->func = bound_func;
-//	}
-//
-//	promise<T> operator()() {
-//		return promise<T>(func);
-//	}
-//
-//private:
-//	std::function<T()> func;
-//};
-//_ALI_END
-///*
-//	async(T(*func)()) {
-//		thread = new std::thread([&] {
-//			value = func();
-//			done = true;
-//			});
-//	}
-//	async(T(*func)(), void(*then)(T)) {
-//		thread = new std::thread([&] {
-//			value = func();
-//			then(T);
-//			done = true;
-//			});
-//	}
-//	async(T(*func)(), size_t wait) {
-//		thread = new std::thread([&] {
-//			Sleep(wait);
-//			value = func();
-//			done = true;
-//			});
-//	}
-//	async(T(*func)(), void(*then)(T), size_t wait) {
-//		thread = new std::thread([&] {
-//			Sleep(wait);
-//			value = func();
-//			then(value);
-//			done = true;
-//			});
-//	}
-//	bool await() {
-//		bool ret = !thread->joinable();
-//		thread->join();
-//		return ret;
-//	}
-//	T get() {
-//		thread->join();
-//		return value;
-//	}
-//	 */
+template <typename R, typename... Args>
+struct return_type<R(Args...)> {
+	using value = R;
+};
+
+template <typename R, typename... Args>
+struct return_type<R(*)(Args...)> {
+	using value = R;
+};
+
+template<typename _Ret>
+class promise {
+public:
+	promise(std::thread* t, bool* f, _Ret* rv) {
+		thread = t;
+		b_finished = f;
+		t_return = rv;
+	}
+
+	~promise() {
+		if (!(*b_finished))
+			thread->join();
+		delete thread;
+		delete b_finished;
+		delete t_return;
+	}
+
+	bool finished() {
+		return *b_finished;
+	}
+
+	_Ret await() {
+		thread->join();
+		return *t_return;
+	}
+
+	_Ret get() {
+		if (!(*b_finished)) throw new std::runtime_error("The task hasn't finished yet!");
+		return *t_return;
+	}
+private:
+	std::thread* thread;
+	bool* b_finished;
+	_Ret* t_return;
+};
+
+template<typename _Func>
+class async {
+public:
+	using Return = return_type<_Func>::value;
+
+	async(_Func f) {
+		func = f;
+	}
+
+	template<typename... _Args>
+	promise<Return> operator()(_Args&&... args) {
+		bool* f = new bool(false);
+		Return* rv = new Return(0);
+		std::thread* t = new std::thread([](_Func(*fun), _Args... a, bool* finished, Return* retVal) {
+			*retVal = fun(a...);
+			*finished = true;
+			}, func, args..., f, rv);
+		return promise<Return>(t, f, rv);
+	}
+private:
+	_Func(*func);
+};
