@@ -6,12 +6,15 @@
 
 using ali::cout;
 
+
 int main() {
-	ali::async<int(std::string&)> x([](std::string& x) -> int {
-		return x[0];
+	ali::async<int(int, int)> multiply([](int one, int two) {
+		Sleep(222);
+		return one * two;
 		});
-	std::string y = "Hekki";
-	cout << x(y).await();
+
+	ali::promise<int> x = multiply(3, 4);
+	cout << x.finished() << '\n' << x.await();
 
 	return 0;
 }
