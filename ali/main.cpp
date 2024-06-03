@@ -8,13 +8,13 @@ using ali::cout;
 
 
 int main() {
-	ali::async<int(int, int)> multiply([](int one, int two) {
-		Sleep(222);
-		return one * two;
+	ali::async<void()> x([] {
+		cout << "hello\n";
 		});
 
-	ali::promise<int> x = multiply(3, 4);
-	cout << x.finished() << '\n' << x.await();
+	x().then<void()>([] {
+		return;
+		}).await();
 
 	return 0;
 }

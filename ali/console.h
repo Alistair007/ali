@@ -222,6 +222,15 @@ public:
 		log(typeid(T).name());
 	}
 
+	void logType(void) {
+		log(typeid(void).name());
+	}
+
+	template<>
+	void logType<void>() {
+		log(typeid(void).name());
+	}
+
 	template<typename T>
 	void error(const T& e) {
 		log(e, 0, 0, 0, 255, 0, 0);
